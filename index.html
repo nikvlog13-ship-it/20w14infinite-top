@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Топ Варпов 20w14infinite · Измерения Майнкрафт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0b0b12;
+            --bg-card: #111116;
+            --surface-elevated: #1a1a24;
+            --text-primary: #f0ebdf;
+            --text-secondary: #b9b2a2;
+            --accent-green: #6a994e;
+            --accent-glow: #90c46c;
+            --border-subtle: rgba(255,255,255,0.08);
+            --radius-card: 18px;
+            --card-height: 112px;
+            --transition-fast: 0.2s ease;
+            --transition-smooth: 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text-primary);
+            padding: 20px 24px 60px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* фоновые узоры */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 20% 30%, rgba(80, 70, 110, 0.2) 0%, transparent 45%),
+                              radial-gradient(circle at 85% 70%, rgba(60, 80, 40, 0.15) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* боковое меню (правая панель) */
+        .category-sidebar {
+            position: sticky;
+            top: 20px;
+            float: right;
+            width: 190px;
+            margin-left: 24px;
+            margin-bottom: 24px;
+            background: rgba(12, 12, 18, 0.75);
+            backdrop-filter: blur(16px);
+            border-radius: 42px;
+            border: 1px solid var(--border-subtle);
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 40;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .category-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 540;
+            padding: 10px 14px;
+            border-radius: 100px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            letter-spacing: 0.01em;
+            backdrop-filter: blur(4px);
+        }
+
+        .category-btn:hover {
+            background: rgba(106, 153, 78, 0.2);
+            color: var(--accent-glow);
+            transform: translateX(4px);
+        }
+
+        .category-btn.active {
+            background: rgba(106, 153, 78, 0.35);
+            color: #e9f5db;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            border-left: 3px solid var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* главный контент с отступом от меню */
+        .content-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .grid-container {
+            flex: 1;
+            min-width: 260px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* карточка варпа */
+        .warp-wrapper {
+            transition: transform 0.2s;
+        }
+
+        .warp-card {
+            height: var(--card-height);
+            width: 100%;
+            border-radius: var(--radius-card);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: flex-end;
+            padding: 14px 18px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255,255,240,0.08);
+        }
+
+        .warp-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(144, 196, 108, 0.4);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .warp-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(125deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 80%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .warp-card__text {
+            position: relative;
+            z-index: 2;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 5px black;
+            color: white;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(8px);
+            padding: 2px 8px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-right: 10px;
+            color: var(--accent-glow);
+            border: 0.5px solid rgba(255,215,0,0.3);
+        }
+
+        /* детальная панель (полный скриншот + инфо) */
+        .warp-detail {
+            max-height: 0;
+            overflow: hidden;
+            background: #0c0c12e6;
+            backdrop-filter: blur(4px);
+            border-radius: 0 0 var(--radius-card) var(--radius-card);
+            transition: max-height 0.5s var(--transition-smooth), margin 0.3s ease;
+            margin-top: 0;
+            border-top: 0px solid transparent;
+        }
+
+        .warp-detail.expanded {
+            max-height: 700px;
+            margin-top: 4px;
+            border-top: 1px solid rgba(255,255,200,0.15);
+            overflow-y: auto;
+        }
+
+        /* ПОЛНЫЙ СКРИНШОТ (не обрезанный) */
+        .full-screenshot {
+            width: 100%;
+            background: #00000055;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            background-color: #050508;
+        }
+
+        .full-screenshot img {
+            max-width: 100%;
+            max-height: 320px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,200,0.2);
+        }
+
+        .detail-info {
+            padding: 16px 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-row {
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .info-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #9e9688;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            color: #e2dccf;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .placeholder-img {
+            background: linear-gradient(145deg, #1f1e2a, #0f0f16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            color: #7a6e5a;
+            border-radius: 14px;
+            font-size: 0.8rem;
+        }
+
+        /* заголовок */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            margin-right: 0px;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #e9e0c7, #baab82);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .header__subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* топ-3 акценты */
+        .warp-wrapper[data-rank="1"] .warp-card {
+            border-color: #e5c05a;
+            box-shadow: 0 0 16px rgba(230, 190, 70, 0.3);
+        }
+        .warp-wrapper[data-rank="2"] .warp-card {
+            border-color: #b8b8c0;
+        }
+        .warp-wrapper[data-rank="3"] .warp-card {
+            border-color: #c9843e;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 48px;
+            font-size: 0.7rem;
+            color: #6a6460;
+            clear: both;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 16px 16px 40px;
+            }
+            .category-sidebar {
+                position: relative;
+                float: none;
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                margin: 0 0 24px 0;
+                background: rgba(8, 8, 14, 0.85);
+                border-radius: 50px;
+                padding: 8px 12px;
+            }
+            .category-btn {
+                text-align: center;
+                padding: 6px 14px;
+                font-size: 0.78rem;
+            }
+            .category-btn.active {
+                border-left: none;
+                border-bottom: 2px solid var(--accent-green);
+            }
+            .grid-container {
+                max-width: 100%;
+            }
+            .full-screenshot img {
+                max-height: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="noise"></div>
+<header class="header">
+    <h1>Топ Варпов 20w14infinite</h1>
+    <p class="header__subtitle">Коллекция варпов • Апрельский снапшот Minecraft</p>
+</header>
+
+<div class="content-wrap">
+    <div class="category-sidebar" id="categoryMenu"></div>
+    <div class="grid-container">
+        <div class="grid" id="warpGrid"></div>
+    </div>
+</div>
+<footer class="footer">
+    <p>⚡ Легендарные варпы сообщества | Java Edition 20w14∞<br></p>
+</footer>
+
+<script>
+    (function() {
+        // ----------------------------- РАСШИРЕННЫЙ СПИСОК ВАРПОВ (категории, полные данные) -----------------------------
+        const DIMENSIONS = [
+            // { id: "", name: "", category: "main", discoverer: "", desc: "", screenshot: "", dateOpened: null },
+            // ========= ОСНОВНОЙ ТОП (main) =========
+            { id: "astrotime", name: "astrotime", category: "main", discoverer: "Джем", desc: "", screenshot: "astrotime.png", dateOpened: null },
+            { id: "zero-1", name: "¦0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-1.png", dateOpened: null },
+            { id: "0null00", name: "0null00", category: "main", discoverer: "Джем", desc: "", screenshot: "0null00.png", dateOpened: null },
+            { id: "zero-3", name: "‡0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-3.png", dateOpened: null },
+            { id: "warp-2", name: "�_ ", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-2.png", dateOpened: null },
+
+            { id: "xix", name: "xix", category: "main", discoverer: "Джем", desc: "", screenshot: "xix.png", dateOpened: null },
+            { id: "58", name: "58", category: "main", discoverer: "МегаНик", desc: "", screenshot: "58.png", dateOpened: null },
+            { id: "zero-4", name: "0\"", category: "main", discoverer: "Джем", desc: "", screenshot: "0null00.png", dateOpened: null },
+            { id: "warp-3", name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-3.png", dateOpened: null },
+            { id: "kepler", name: "kepler", category: "main", discoverer: "Арбуз", desc: "", screenshot: "kepler.png", dateOpened: null },
+            
+            // ========= КРАШ-ИЗМЕРЕНИЯ (crash) – вместо описания дата открытия =========
+            { id: "crash_2", name: "-6", category: "crash", discoverer: "МегаНик", desc: null, screenshot: "crash-2.png", dateOpened: "16.05.2026" },
+            { id: "crash_3", name: "9;;", category: "crash", discoverer: "Джем", desc: null, screenshot: "crash-3.webp", dateOpened: "16.05.2026" },
+            { id: "crash_4", name: "strange world", category: "crash", discoverer: "Арбуз", desc: null, screenshot: "crash-4.png", dateOpened: "17.05.2026" },
+            { id: "crash_5", name: "rata", category: "crash", discoverer: "Джем", desc: null, screenshot: "crash-5.png", dateOpened: "17.05.2026" },
+            { id: "crash_6", name: "n:(0", category: "crash", discoverer: "МегаНик", desc: null, screenshot: "crash-6.png", dateOpened: "18.05.2026" },
+            { id: "crash_1", name: "омлет", category: "crash", discoverer: "Арбуз", desc: null, screenshot: "crash-1.png", dateOpened: "18.05.2026" },
+            
+            // ========= ПЛОСКИЕ ИЗМЕРЕНИЯ (flat) =========
+            { id: "flat_1", name: "3.14", category: "flat", discoverer: "Арбуз", desc: "", screenshot: "flat-1.png", dateOpened: null },
+            
+            // ========= СТРАЖНЫЕ ИЗМЕРЕНИЯ (guardian) =========
+            { id: "zero-2", name: "\"0", category: "guardian", discoverer: "МегаНик", desc: "", screenshot: "zero-2.png", dateOpened: null },
+            { id: "warp-1", name: "ballooning jade'd", category: "guardian", discoverer: "Джем", desc: "", screenshot: "warp-1.png", dateOpened: null },
+            { id: "easter", name: "easter", category: "guardian", discoverer: "Арбуз", desc: "", screenshot: "easter.webp", dateOpened: null },
+        ];
+
+        // ---------- конфиг категорий ----------
+        const categories = [
+            { id: "main", label: "🌌 Основной Топ", showRanks: true, descLabel: "Описание", dateLabel: null },
+            { id: "crash", label: "💥 Краш-измерения", showRanks: false, descLabel: "Дата открытия", dateLabel: "Дата открытия", useDateInsteadDesc: true },
+            { id: "flat", label: "⬜ Плоские измерения", showRanks: false, descLabel: "Описание", dateLabel: null },
+            { id: "guardian", label: "🛡️ Стражные измерения", showRanks: false, descLabel: "Описание", dateLabel: null }
+        ];
+
+        let activeCategory = "main";
+        const gridContainer = document.getElementById("warpGrid");
+        const categoryMenu = document.getElementById("categoryMenu");
+
+        // вспомогательная функция для placeholder изображения (если нет скриншота)
+        function getImageUrl(screenshotPath, dimensionName) {
+            if (screenshotPath && screenshotPath.trim() !== "") {
+                // В реальной сборке картинки могут отсутствовать, но используем путь как есть.
+                // Для демонстрации — если изображение не загрузится, показываем заглушку через onerror.
+                return screenshotPath;
+            }
+            return null;
+        }
+
+        // отрисовка списка на основе активной категории
+        function render() {
+            if (!gridContainer) return;
+            const filtered = DIMENSIONS.filter(dim => dim.category === activeCategory);
+            if (filtered.length === 0) {
+                gridContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#aaa;">✨ Нет измерений в этой категории, но бесконечность скрывает ещё варпы...</div>`;
+                return;
+            }
+
+            gridContainer.innerHTML = "";
+            filtered.forEach((warp, idx) => {
+                const rank = idx + 1;
+                const categoryConfig = categories.find(c => c.id === activeCategory);
+                const showRank = categoryConfig?.showRanks === true;
+                
+                const wrapper = document.createElement("div");
+                wrapper.className = "warp-wrapper";
+                if (showRank) wrapper.setAttribute("data-rank", rank);
+                wrapper.setAttribute("data-warp-id", warp.id);
+
+                const card = document.createElement("div");
+                card.className = "warp-card";
+                card.setAttribute("tabindex", "0");
+                card.setAttribute("role", "button");
+                card.setAttribute("aria-expanded", "false");
+
+                // Динамически строим путь к изображению
+                const imagePath = warp.screenshot ? "images/" + warp.screenshot : null;
+                if (imagePath) {
+                    card.style.backgroundImage = `url('${imagePath}')`;
+                    card.style.backgroundSize = "cover";
+                } else {
+                    card.style.background = "linear-gradient(135deg, #2a282f, #13111a)";
+                }
+
+                let cardHTML = `<span class="warp-card__text">`;
+                if (showRank) cardHTML += `<span class="rank-badge">#${rank}</span>`;
+                cardHTML += `${warp.name}</span>`;
+                card.innerHTML = cardHTML;
+
+                const detailDiv = document.createElement("div");
+                detailDiv.className = "warp-detail";
+
+                const screenshotContainer = document.createElement("div");
+                screenshotContainer.className = "full-screenshot";
+                const imgElement = document.createElement("img");
+                if (imagePath) {
+                    imgElement.src = imagePath;
+                    imgElement.alt = `${warp.name} – полный вид`;
+                    imgElement.loading = "lazy";
+                    imgElement.onerror = () => {
+                        imgElement.style.display = "none";
+                        const fallback = document.createElement("div");
+                        fallback.className = "placeholder-img";
+                        fallback.innerText = "🖼️ Скриншот измерения не загружен";
+                        screenshotContainer.appendChild(fallback);
+                    };
+                    screenshotContainer.appendChild(imgElement);
+                } else {
+                    const placeholder = document.createElement("div");
+                    placeholder.className = "placeholder-img";
+                    placeholder.innerText = "🌄 Изображение отсутствует";
+                    screenshotContainer.appendChild(placeholder);
+                }
+
+                // информация в деталях (в зависимости от категории)
+                const infoDiv = document.createElement("div");
+                infoDiv.className = "detail-info";
+                
+                // Первооткрыватель всегда показываем
+                const discovererRow = document.createElement("div");
+                discovererRow.className = "info-row";
+                discovererRow.innerHTML = `<div class="info-label">🔍 ПЕРВООТКРЫВАТЕЛЬ</div><div class="info-value">${warp.discoverer || 'Неизвестный странник'}</div>`;
+                infoDiv.appendChild(discovererRow);
+                
+                // основной контент: для краш-измерений используем дату открытия вместо описания
+                if (activeCategory === "crash" && warp.dateOpened) {
+                    const dateRow = document.createElement("div");
+                    dateRow.className = "info-row";
+                    dateRow.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">${warp.dateOpened}</div>`;
+                    infoDiv.appendChild(dateRow);
+                } 
+                else if (warp.desc && warp.desc.trim() !== "") {
+                    const descRow = document.createElement("div");
+                    descRow.className = "info-row";
+                    const labelText = (activeCategory === "crash") ? "📆 ДАТА ОТКРЫТИЯ" : "📖 ОПИСАНИЕ";
+                    // дополнительная проверка (на случай, если не crash но есть описание)
+                    descRow.innerHTML = `<div class="info-label">${labelText}</div><div class="info-value">${warp.desc}</div>`;
+                    infoDiv.appendChild(descRow);
+                } 
+                else if (activeCategory !== "crash") {
+                    // заглушка, если описания нет
+                    const stubRow = document.createElement("div");
+                    stubRow.className = "info-row";
+                    stubRow.innerHTML = `<div class="info-label">📖 ОПИСАНИЕ</div><div class="info-value"></div>`;
+                    infoDiv.appendChild(stubRow);
+                }
+                
+                // Для категории crash, если нет dateOpened но есть описание - мы не используем описание, но показываем fallback
+                if (activeCategory === "crash" && !warp.dateOpened && (!warp.desc || warp.desc === null)) {
+                    const missingDate = document.createElement("div");
+                    missingDate.className = "info-row";
+                    missingDate.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">Данные утеряны в хрониках бесконечности</div>`;
+                    infoDiv.appendChild(missingDate);
+                }
+                
+                detailDiv.appendChild(screenshotContainer);
+                detailDiv.appendChild(infoDiv);
+                wrapper.appendChild(card);
+                wrapper.appendChild(detailDiv);
+                gridContainer.appendChild(wrapper);
+                
+                // ----- анимация открытия/закрытия с корректным скроллом и закрытием других -----
+                let isTransitioning = false;
+                const toggleDetail = () => {
+                    if (isTransitioning) return;
+                    const isExpanding = !detailDiv.classList.contains("expanded");
+                    
+                    // закрыть все другие открытые детали
+                    document.querySelectorAll(".warp-detail.expanded").forEach(otherDetail => {
+                        if (otherDetail !== detailDiv) {
+                            const otherParent = otherDetail.parentElement;
+                            const otherCardElem = otherParent?.querySelector(".warp-card");
+                            if (otherCardElem) otherCardElem.setAttribute("aria-expanded", "false");
+                            otherDetail.classList.remove("expanded");
+                            otherDetail.style.maxHeight = "0";
+                            if (otherParent) otherParent.classList.remove("expanded-wrapper");
+                        }
+                    });
+                    
+                    if (isExpanding) {
+                        detailDiv.classList.add("expanded");
+                        // временно снимаем лимит для корректного расчёта
+                        detailDiv.style.maxHeight = "none";
+                        const fullHeight = detailDiv.scrollHeight;
+                        detailDiv.style.maxHeight = "0";
+                        detailDiv.offsetHeight; // reflow
+                        detailDiv.style.maxHeight = fullHeight + "px";
+                        card.setAttribute("aria-expanded", "true");
+                        wrapper.classList.add("expanded-wrapper");
+                        
+                        const finishOpen = () => {
+                            if (detailDiv.classList.contains("expanded")) {
+                                detailDiv.style.maxHeight = "none";
+                            }
+                            detailDiv.removeEventListener("transitionend", finishOpen);
+                            isTransitioning = false;
+                        };
+                        detailDiv.addEventListener("transitionend", finishOpen);
+                        isTransitioning = true;
+                        
+                        // плавный скролл к карточке после открытия
+                        setTimeout(() => {
+                            const rect = card.getBoundingClientRect();
+                            const scrollTop = window.pageYOffset;
+                            const targetY = scrollTop + rect.top - 70;
+                            window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+                        }, 100);
+                    } else {
+                        // закрытие
+                        detailDiv.style.maxHeight = detailDiv.scrollHeight + "px";
+                        detailDiv.offsetHeight;
+                        detailDiv.style.maxHeight = "0";
+                        detailDiv.classList.remove("expanded");
+                        card.setAttribute("aria-expanded", "false");
+                        wrapper.classList.remove("expanded-wrapper");
+                        const finishClose = () => {
+                            detailDiv.style.maxHeight = "";
+                            detailDiv.removeEventListener("transitionend", finishClose);
+                            isTransitioning = false;
+                        };
+                        detailDiv.addEventListener("transitionend", finishClose);
+                        isTransitioning = true;
+                    }
+                };
+                
+                card.addEventListener("click", toggleDetail);
+                card.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleDetail();
+                    }
+                });
+            });
+        }
+
+        // построение UI категорий (правого меню)
+        function buildCategoryMenu() {
+            if (!categoryMenu) return;
+            categoryMenu.innerHTML = "";
+            categories.forEach(cat => {
+                const btn = document.createElement("button");
+                btn.className = `category-btn ${activeCategory === cat.id ? "active" : ""}`;
+                btn.textContent = cat.label;
+                btn.setAttribute("data-cat", cat.id);
+                btn.addEventListener("click", () => {
+                    if (activeCategory === cat.id) return;
+                    activeCategory = cat.id;
+                    // обновить активную кнопку
+                    document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    // закрыть все открытые детали перед перерисовкой
+                    document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
+                        detail.classList.remove("expanded");
+                        if (detail.parentElement) {
+                            const cardElem = detail.parentElement.querySelector(".warp-card");
+                            if (cardElem) cardElem.setAttribute("aria-expanded", "false");
+                            detail.parentElement.classList.remove("expanded-wrapper");
+                        }
+                        detail.style.maxHeight = "0";
+                    });
+                    render();
+                });
+                categoryMenu.appendChild(btn);
+            });
+        }
+        
+        // инициализация: построить меню, отрисовать основной топ по умолчанию
+        buildCategoryMenu();
+        render();
+        
+        // обработчик изменения размера: для открытых деталей сбрасываем max-height на 'none', чтобы сохранить корректный вид
+        window.addEventListener("resize", () => {
+            document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
+                detail.style.maxHeight = "none";
+            });
+        });
+        
+        // если картинки загружаются с ошибкой, ими уже управляет onerror img
+        // дополнительная стилизация для скролла
+    })();
+</script>
+</body>
+</html>
