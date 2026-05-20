@@ -58,23 +58,30 @@
             z-index: -1;
         }
 
-        /* боковое меню (правая панель) */
-        .category-sidebar {
+        /* правая панель (меню категорий + топ игроков) */
+        .right-sidebar {
             position: sticky;
             top: 20px;
             float: right;
-            width: 190px;
+            width: 260px;
             margin-left: 24px;
             margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 40;
+        }
+
+        /* блок категорий (существующее меню) */
+        .category-sidebar {
             background: rgba(12, 12, 18, 0.75);
             backdrop-filter: blur(16px);
-            border-radius: 42px;
+            border-radius: 32px;
             border: 1px solid var(--border-subtle);
             padding: 12px 8px;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            z-index: 40;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
@@ -108,7 +115,92 @@
             font-weight: 600;
         }
 
-        /* главный контент с отступом от меню */
+        /* ---------- БЛОК ТОПА ИГРОКОВ (СТОЛБИКОМ, НЕ ВЫДВИГАЕТСЯ) ---------- */
+        .top-players {
+            background: rgba(12, 12, 18, 0.75);
+            backdrop-filter: blur(16px);
+            border-radius: 28px;
+            border: 1px solid var(--border-subtle);
+            padding: 14px 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+        }
+
+        .top-players__title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent-glow);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px dashed rgba(255,255,200,0.25);
+            padding-bottom: 8px;
+        }
+
+        .top-players__title span {
+            font-size: 1.2rem;
+        }
+
+        .players-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 5px 4px;
+            border-radius: 40px;
+            background: rgba(255,255,245,0.02);
+            transition: background 0.15s;
+        }
+
+        .player-row:hover {
+            background: rgba(106, 153, 78, 0.15);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+            font-weight: 500;
+        }
+
+        .player-rank {
+            color: var(--accent-glow);
+            font-weight: 700;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            min-width: 38px;
+            text-align: center;
+        }
+
+        .player-name {
+            color: #f0ead8;
+            font-weight: 500;
+        }
+
+        .player-points {
+            font-family: monospace;
+            font-weight: 600;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #ffd966;
+            letter-spacing: 0.5px;
+        }
+
+        /* главный контент с отступом от правой панели */
         .content-wrap {
             display: flex;
             flex-wrap: wrap;
@@ -208,7 +300,6 @@
             overflow-y: auto;
         }
 
-        /* ПОЛНЫЙ СКРИНШОТ (не обрезанный) */
         .full-screenshot {
             width: 100%;
             background: #00000055;
@@ -270,11 +361,9 @@
             font-size: 0.8rem;
         }
 
-        /* заголовок */
         .header {
             text-align: center;
             margin-bottom: 28px;
-            margin-right: 0px;
         }
 
         .header h1 {
@@ -291,7 +380,6 @@
             font-size: 0.85rem;
         }
 
-        /* топ-3 акценты */
         .warp-wrapper[data-rank="1"] .warp-card {
             border-color: #e5c05a;
             box-shadow: 0 0 16px rgba(230, 190, 70, 0.3);
@@ -315,17 +403,22 @@
             body {
                 padding: 16px 16px 40px;
             }
-            .category-sidebar {
+            .right-sidebar {
                 position: relative;
                 float: none;
                 width: 100%;
+                margin-left: 0;
+                margin-bottom: 24px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .category-sidebar {
+                flex: 2;
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: center;
-                gap: 10px;
-                margin: 0 0 24px 0;
-                background: rgba(8, 8, 14, 0.85);
-                border-radius: 50px;
+                border-radius: 60px;
                 padding: 8px 12px;
             }
             .category-btn {
@@ -336,6 +429,10 @@
             .category-btn.active {
                 border-left: none;
                 border-bottom: 2px solid var(--accent-green);
+            }
+            .top-players {
+                flex: 1;
+                min-width: 200px;
             }
             .grid-container {
                 max-width: 100%;
@@ -354,46 +451,65 @@
 </header>
 
 <div class="content-wrap">
-    <div class="category-sidebar" id="categoryMenu"></div>
+    <!-- Правая панель: меню категорий + блок топа игроков -->
+    <div class="right-sidebar">
+        <div class="category-sidebar" id="categoryMenu"></div>
+        
+        <!-- БЛОК ТОП ИГРОКОВ (статичный, без раскрытия) -->
+        <div class="top-players" id="topPlayersBlock">
+            <div class="top-players__title">
+                <span>🏆</span> ТОП ИССЛЕДОВАТЕЛЕЙ
+            </div>
+            <div class="players-list" id="playersList">
+                <!-- сюда динамически вставим рейтинг -->
+            </div>
+        </div>
+    </div>
+
     <div class="grid-container">
         <div class="grid" id="warpGrid"></div>
     </div>
 </div>
 <footer class="footer">
-    <p>⚡ Легендарные варпы сообщества | Java Edition 20w14∞<br></p>
+    <p>⚡ Легендарные варпы сообщества | Java Edition 20w14∞<br>⭐ Рейтинг исследователей основан на количестве открытых уникальных варпов</p>
 </footer>
 
 <script>
     (function() {
-        // ----------------------------- РАСШИРЕННЫЙ СПИСОК ВАРПОВ (категории, полные данные) -----------------------------
+        // ======================== ДАННЫЕ ВАРПОВ (без id) ========================
         const DIMENSIONS = [
-            // { name: "", category: "main", discoverer: "", desc: "", screenshot: "", dateOpened: null },
             // ========= ОСНОВНОЙ ТОП (main) =========
             { name: "astrotime", category: "main", discoverer: "Джем", desc: "", screenshot: "astrotime.png", dateOpened: null },
             { name: "¦0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-1.png", dateOpened: null },
             { name: "0null00", category: "main", discoverer: "Джем", desc: "", screenshot: "0null00.png", dateOpened: null },
             { name: "‡0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-3.png", dateOpened: null },
             { name: "�_ ", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-2.png", dateOpened: null },
-
             { name: "xix", category: "main", discoverer: "Джем", desc: "", screenshot: "xix.png", dateOpened: null },
             { name: "58", category: "main", discoverer: "Гаст", desc: "", screenshot: "58.png", dateOpened: null },
             { name: "0\"", category: "main", discoverer: "Джем", desc: "", screenshot: "zero-4.png", dateOpened: null },
             { name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-3.png", dateOpened: null },
             { name: "kepler", category: "main", discoverer: "Арбуз", desc: "", screenshot: "kepler.png", dateOpened: null },
-
             { name: "0!", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-6.png", dateOpened: null },
             { name: "☼ƒ0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-5.png", dateOpened: null },
             { name: "-666", category: "main", discoverer: "МегаНик", desc: "", screenshot: "-666.png", dateOpened: null },
             { name: "RIP", category: "main", discoverer: "МегаНик", desc: "", screenshot: "RIP.png", dateOpened: null },
             { name: "microworld", category: "main", discoverer: "Арбуз", desc: "", screenshot: "microworld.png", dateOpened: null },
-
             { name: "0:", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-8.png", dateOpened: null },
-            { name: "0/", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-7.png", dateOpened: null },
+            { name: "/0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-7.png", dateOpened: null },
+            { name: "heaven", category: "main", discoverer: "Джем", desc: "", screenshot: "heaven.png", dateOpened: null },
+            { name: "!@#$%^&*()", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-5.png", dateOpened: null },
+            { name: "+0", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-9.png", dateOpened: null },
+            { name: "0'", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-10.png", dateOpened: null },
+            { name: "00", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-12.png", dateOpened: null },
             { name: "earth", category: "main", discoverer: "Арбуз", desc: "", screenshot: "earth.png", dateOpened: null },
+            { name: "9#!", category: "main", discoverer: "Джем", desc: "", screenshot: "nine-2.png", dateOpened: null },
+            { name: "miniworld", category: "main", discoverer: "Арбуз", desc: "", screenshot: "miniworld.png", dateOpened: null },
             { name: "Solicitamos su colaboración para la localización de Selene Delgado López, de 18 años, que desapareció el 22 de abril en la delegación Álvaro Obregón", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-4.png", dateOpened: null },
-            { name: "@9!", category: "main", discoverer: "Джем", desc: "", screenshot: "nine-2.png", dateOpened: null },
+            { name: "@9!", category: "main", discoverer: "Джем", desc: "", screenshot: "nine-1.png", dateOpened: null },
+            { name: "00000", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-11.png", dateOpened: null },
+            { name: "dkmwljet90o34u32890rjqfp8i4hyu89f3yurpg9387h;u745uyfg485jkd3r41l*ы10d1l99dldll9od,0;lsdф0a0k", category: "main", discoverer: "Джем", desc: "", screenshot: "zero-13.png", dateOpened: null },
             
-            // ========= КРАШ-ИЗМЕРЕНИЯ (crash) – вместо описания дата открытия =========
+            // ========= КРАШ-ИЗМЕРЕНИЯ (crash) =========
             { name: "-6", category: "crash", discoverer: "МегаНик", desc: null, screenshot: "crash-2.png", dateOpened: "16.05.2026" },
             { name: "9;;", category: "crash", discoverer: "Джем", desc: null, screenshot: "crash-3.webp", dateOpened: "16.05.2026" },
             { name: "strange world", category: "crash", discoverer: "Арбуз", desc: null, screenshot: "crash-4.png", dateOpened: "17.05.2026" },
@@ -410,7 +526,7 @@
             { name: "easter", category: "guardian", discoverer: "Арбуз", desc: "", screenshot: "easter.webp", dateOpened: null },
         ];
 
-        // ---------- конфиг категорий ----------
+        // конфиг категорий
         const categories = [
             { id: "main", label: "🌌 Основной Топ", showRanks: true, descLabel: "Описание", dateLabel: null },
             { id: "crash", label: "💥 Краш-измерения", showRanks: false, descLabel: "Дата открытия", dateLabel: "Дата открытия", useDateInsteadDesc: true },
@@ -422,17 +538,59 @@
         const gridContainer = document.getElementById("warpGrid");
         const categoryMenu = document.getElementById("categoryMenu");
 
-        // вспомогательная функция для placeholder изображения (если нет скриншота)
-        function getImageUrl(screenshotPath, dimensionName) {
-            if (screenshotPath && screenshotPath.trim() !== "") {
-                // В реальной сборке картинки могут отсутствовать, но используем путь как есть.
-                // Для демонстрации — если изображение не загрузится, показываем заглушку через onerror.
-                return screenshotPath;
-            }
-            return null;
+        // ------------------- ТОП ИГРОКОВ (РЕЙТИНГ) -------------------
+        // Рассчитываем баллы на основе количества открытых варпов (каждый уникальный варп = 1 балл)
+        function buildPlayersRanking() {
+            // Ручные баллы (меняйте здесь)
+            const customScores = {
+                "Джем": 2.1960,
+                "МегаНик": 1.3726,
+                "Арбуз": 0.2502,
+                "Гаст": 0.1429
+            };
+            let ranking = Object.entries(customScores).map(([name, points]) => ({ name, points }));
+            ranking.sort((a,b) => b.points - a.points);
+            return ranking;
         }
 
-        // отрисовка списка на основе активной категории
+        function renderTopPlayers() {
+            const container = document.getElementById("playersList");
+            if (!container) return;
+            const ranking = buildPlayersRanking();
+            if (ranking.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; text-align:center; color:#999;">Нет данных</div>';
+                return;
+            }
+            container.innerHTML = "";
+            ranking.forEach((player, idx) => {
+                const rank = idx + 1;
+                const row = document.createElement("div");
+                row.className = "player-row";
+                row.innerHTML = `
+                    <div class="player-info">
+                        <span class="player-rank">#${rank}</span>
+                        <span class="player-name">${escapeHtml(player.name)}</span>
+                    </div>
+                    <span class="player-points">${player.points} баллов</span>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // простой esc для защиты от XSS
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
+        }
+
+        // ------------------- ОТРИСОВКА КАРТОЧЕК ВАРПОВ (рабочая, без id) -------------------
         function render() {
             if (!gridContainer) return;
             const filtered = DIMENSIONS.filter(dim => dim.category === activeCategory);
@@ -457,7 +615,6 @@
                 card.setAttribute("role", "button");
                 card.setAttribute("aria-expanded", "false");
 
-                // Динамически строим путь к изображению
                 const imagePath = warp.screenshot ? "images/" + warp.screenshot : null;
                 if (imagePath) {
                     card.style.backgroundImage = `url('${imagePath}')`;
@@ -468,7 +625,7 @@
 
                 let cardHTML = `<span class="warp-card__text">`;
                 if (showRank) cardHTML += `<span class="rank-badge">#${rank}</span>`;
-                cardHTML += `${warp.name}</span>`;
+                cardHTML += `${escapeHtml(warp.name)}</span>`;
                 card.innerHTML = cardHTML;
 
                 const detailDiv = document.createElement("div");
@@ -496,40 +653,34 @@
                     screenshotContainer.appendChild(placeholder);
                 }
 
-                // информация в деталях (в зависимости от категории)
                 const infoDiv = document.createElement("div");
                 infoDiv.className = "detail-info";
                 
-                // Первооткрыватель всегда показываем
                 const discovererRow = document.createElement("div");
                 discovererRow.className = "info-row";
-                discovererRow.innerHTML = `<div class="info-label">🔍 ПЕРВООТКРЫВАТЕЛЬ</div><div class="info-value">${warp.discoverer || 'Неизвестный странник'}</div>`;
+                discovererRow.innerHTML = `<div class="info-label">🔍 ПЕРВООТКРЫВАТЕЛЬ</div><div class="info-value">${escapeHtml(warp.discoverer || 'Неизвестный странник')}</div>`;
                 infoDiv.appendChild(discovererRow);
                 
-                // основной контент: для краш-измерений используем дату открытия вместо описания
                 if (activeCategory === "crash" && warp.dateOpened) {
                     const dateRow = document.createElement("div");
                     dateRow.className = "info-row";
-                    dateRow.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">${warp.dateOpened}</div>`;
+                    dateRow.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">${escapeHtml(warp.dateOpened)}</div>`;
                     infoDiv.appendChild(dateRow);
                 } 
                 else if (warp.desc && warp.desc.trim() !== "") {
                     const descRow = document.createElement("div");
                     descRow.className = "info-row";
                     const labelText = (activeCategory === "crash") ? "📆 ДАТА ОТКРЫТИЯ" : "📖 ОПИСАНИЕ";
-                    // дополнительная проверка (на случай, если не crash но есть описание)
-                    descRow.innerHTML = `<div class="info-label">${labelText}</div><div class="info-value">${warp.desc}</div>`;
+                    descRow.innerHTML = `<div class="info-label">${labelText}</div><div class="info-value">${escapeHtml(warp.desc)}</div>`;
                     infoDiv.appendChild(descRow);
                 } 
                 else if (activeCategory !== "crash") {
-                    // заглушка, если описания нет
                     const stubRow = document.createElement("div");
                     stubRow.className = "info-row";
                     stubRow.innerHTML = `<div class="info-label">📖 ОПИСАНИЕ</div><div class="info-value"></div>`;
                     infoDiv.appendChild(stubRow);
                 }
                 
-                // Для категории crash, если нет dateOpened но есть описание - мы не используем описание, но показываем fallback
                 if (activeCategory === "crash" && !warp.dateOpened && (!warp.desc || warp.desc === null)) {
                     const missingDate = document.createElement("div");
                     missingDate.className = "info-row";
@@ -543,13 +694,12 @@
                 wrapper.appendChild(detailDiv);
                 gridContainer.appendChild(wrapper);
                 
-                // ----- анимация открытия/закрытия с корректным скроллом и закрытием других -----
+                // анимация открытия/закрытия (без изменений)
                 let isTransitioning = false;
                 const toggleDetail = () => {
                     if (isTransitioning) return;
                     const isExpanding = !detailDiv.classList.contains("expanded");
                     
-                    // закрыть все другие открытые детали
                     document.querySelectorAll(".warp-detail.expanded").forEach(otherDetail => {
                         if (otherDetail !== detailDiv) {
                             const otherParent = otherDetail.parentElement;
@@ -563,26 +713,21 @@
                     
                     if (isExpanding) {
                         detailDiv.classList.add("expanded");
-                        // временно снимаем лимит для корректного расчёта
                         detailDiv.style.maxHeight = "none";
                         const fullHeight = detailDiv.scrollHeight;
                         detailDiv.style.maxHeight = "0";
-                        detailDiv.offsetHeight; // reflow
+                        detailDiv.offsetHeight;
                         detailDiv.style.maxHeight = fullHeight + "px";
                         card.setAttribute("aria-expanded", "true");
                         wrapper.classList.add("expanded-wrapper");
                         
                         const finishOpen = () => {
-                            if (detailDiv.classList.contains("expanded")) {
-                                detailDiv.style.maxHeight = "none";
-                            }
+                            if (detailDiv.classList.contains("expanded")) detailDiv.style.maxHeight = "none";
                             detailDiv.removeEventListener("transitionend", finishOpen);
                             isTransitioning = false;
                         };
                         detailDiv.addEventListener("transitionend", finishOpen);
                         isTransitioning = true;
-                        
-                        // плавный скролл к карточке после открытия
                         setTimeout(() => {
                             const rect = card.getBoundingClientRect();
                             const scrollTop = window.pageYOffset;
@@ -590,7 +735,6 @@
                             window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
                         }, 100);
                     } else {
-                        // закрытие
                         detailDiv.style.maxHeight = detailDiv.scrollHeight + "px";
                         detailDiv.offsetHeight;
                         detailDiv.style.maxHeight = "0";
@@ -606,7 +750,6 @@
                         isTransitioning = true;
                     }
                 };
-                
                 card.addEventListener("click", toggleDetail);
                 card.addEventListener("keydown", (e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -617,7 +760,6 @@
             });
         }
 
-        // построение UI категорий (правого меню)
         function buildCategoryMenu() {
             if (!categoryMenu) return;
             categoryMenu.innerHTML = "";
@@ -629,10 +771,8 @@
                 btn.addEventListener("click", () => {
                     if (activeCategory === cat.id) return;
                     activeCategory = cat.id;
-                    // обновить активную кнопку
                     document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
                     btn.classList.add("active");
-                    // закрыть все открытые детали перед перерисовкой
                     document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
                         detail.classList.remove("expanded");
                         if (detail.parentElement) {
@@ -648,19 +788,15 @@
             });
         }
         
-        // инициализация: построить меню, отрисовать основной топ по умолчанию
         buildCategoryMenu();
         render();
+        renderTopPlayers();  // отображаем топ игроков (не двигается, статичный список)
         
-        // обработчик изменения размера: для открытых деталей сбрасываем max-height на 'none', чтобы сохранить корректный вид
         window.addEventListener("resize", () => {
             document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
                 detail.style.maxHeight = "none";
             });
         });
-        
-        // если картинки загружаются с ошибкой, ими уже управляет onerror img
-        // дополнительная стилизация для скролла
     })();
 </script>
 </body>
