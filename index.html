@@ -455,13 +455,13 @@
     <div class="right-sidebar">
         <div class="category-sidebar" id="categoryMenu"></div>
         
-        <!-- БЛОК ТОП ИГРОКОВ (статичный, без раскрытия) -->
+        <!-- БЛОК ТОП ИГРОКОВ (статичный) -->
         <div class="top-players" id="topPlayersBlock">
             <div class="top-players__title">
                 <span>🏆</span> ТОП ИССЛЕДОВАТЕЛЕЙ
             </div>
             <div class="players-list" id="playersList">
-                <!-- сюда динамически вставим рейтинг -->
+                <!-- рейтинг -->
             </div>
         </div>
     </div>
@@ -476,7 +476,7 @@
 
 <script>
     (function() {
-        // ======================== ДАННЫЕ ВАРПОВ (без id) ========================
+        // ======================== ДАННЫЕ ВАРПОВ ========================
         const DIMENSIONS = [
             // ========= ОСНОВНОЙ ТОП (main) =========
             { name: "astrotime", category: "main", discoverer: "Джем", desc: "", screenshot: "astrotime.png", dateOpened: null },
@@ -507,7 +507,7 @@
             { name: "Solicitamos su colaboración para la localización de Selene Delgado López, de 18 años, que desapareció el 22 de abril en la delegación Álvaro Obregón", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-4.png", dateOpened: null },
             { name: "@9!", category: "main", discoverer: "Джем", desc: "", screenshot: "nine-1.png", dateOpened: null },
             { name: "00000", category: "main", discoverer: "МегаНик", desc: "", screenshot: "zero-11.png", dateOpened: null },
-            { name: "dkmwljet90o34u32890rjqfp8i4hyu89f3yurpg9387h;u745uyfg485jkd3r41l*ы10d1l99dldll9od,0;lsdф0a0k", category: "main", discoverer: "Джем", desc: "", screenshot: "zero-13.png", dateOpened: null },
+            { name: "dkmwljet90o34u32890rjqfp8i4hyu89f3yurpg9387h;u745uyfg485jkd3r41l*ы10d1l99dldll9od,0;lsdф0a0k", category: "main", discoverer: "Джем", desc: "", screenshot: "warp-6.png", dateOpened: null },
             
             // ========= КРАШ-ИЗМЕРЕНИЯ (crash) =========
             { name: "-6", category: "crash", discoverer: "МегаНик", desc: null, screenshot: "crash-2.png", dateOpened: "16.05.2026" },
@@ -524,14 +524,24 @@
             { name: "\"0", category: "guardian", discoverer: "МегаНик", desc: "", screenshot: "zero-2.png", dateOpened: null },
             { name: "ballooning jade'd", category: "guardian", discoverer: "Джем", desc: "", screenshot: "warp-1.png", dateOpened: null },
             { name: "easter", category: "guardian", discoverer: "Арбуз", desc: "", screenshot: "easter.webp", dateOpened: null },
+
+            // ========= НОВАЯ КАТЕГОРИЯ: БИОМЫ (biome) =========
+            // Поля: discoverer → название варпа / команда, desc → координаты XYZ
+            { name: "1106852230", category: "biome", discoverer: "/warp 0", desc: "-576/-724", screenshot: "biomes/1106852230.png", dateOpened: null },
+            { name: "1195805389", category: "biome", discoverer: "/warp 0", desc: "-3556/-792", screenshot: "biomes/1195805389.png", dateOpened: null },
+            { name: "1804258846", category: "biome", discoverer: "/warp 0", desc: "-2820/-1144", screenshot: "biomes/1804258846.png", dateOpened: null },
+            { name: "2110816154", category: "biome", discoverer: "/warp 0", desc: "-1116/-484", screenshot: "biomes/2110816154.png", dateOpened: null },
+            { name: "593616727", category: "biome", discoverer: "/warp 0", desc: "964/-1668", screenshot: "biomes/593616727.png", dateOpened: null },
+            { name: "964779764", category: "biome", discoverer: "/warp 0", desc: "932/-1700", screenshot: "biomes/964779764.png", dateOpened: null },
         ];
 
-        // конфиг категорий
+        // конфиг категорий (добавлена "Биомы")
         const categories = [
             { id: "main", label: "🌌 Основной Топ", showRanks: true, descLabel: "Описание", dateLabel: null },
             { id: "crash", label: "💥 Краш-измерения", showRanks: false, descLabel: "Дата открытия", dateLabel: "Дата открытия", useDateInsteadDesc: true },
             { id: "flat", label: "⬜ Плоские измерения", showRanks: false, descLabel: "Описание", dateLabel: null },
-            { id: "guardian", label: "🛡️ Стражные измерения", showRanks: false, descLabel: "Описание", dateLabel: null }
+            { id: "guardian", label: "🛡️ Стражные измерения", showRanks: false, descLabel: "Описание", dateLabel: null },
+            { id: "biome", label: "🌍 Биомы", showRanks: false, descLabel: "XZ", isBiomeCategory: true }   // новая категория
         ];
 
         let activeCategory = "main";
@@ -539,9 +549,7 @@
         const categoryMenu = document.getElementById("categoryMenu");
 
         // ------------------- ТОП ИГРОКОВ (РЕЙТИНГ) -------------------
-        // Рассчитываем баллы на основе количества открытых варпов (каждый уникальный варп = 1 балл)
         function buildPlayersRanking() {
-            // Ручные баллы (меняйте здесь)
             const customScores = {
                 "Джем": 2.1960,
                 "МегаНик": 1.3726,
@@ -577,7 +585,6 @@
             });
         }
 
-        // простой esc для защиты от XSS
         function escapeHtml(str) {
             if (!str) return "";
             return str.replace(/[&<>]/g, function(m) {
@@ -585,12 +592,10 @@
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';
                 return m;
-            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-                return c;
             });
         }
 
-        // ------------------- ОТРИСОВКА КАРТОЧЕК ВАРПОВ (рабочая, без id) -------------------
+        // ------------------- ОТРИСОВКА КАРТОЧЕК ВАРПОВ (с поддержкой категории "Биомы") -------------------
         function render() {
             if (!gridContainer) return;
             const filtered = DIMENSIONS.filter(dim => dim.category === activeCategory);
@@ -604,6 +609,7 @@
                 const rank = idx + 1;
                 const categoryConfig = categories.find(c => c.id === activeCategory);
                 const showRank = categoryConfig?.showRanks === true;
+                const isBiome = (activeCategory === "biome");
                 
                 const wrapper = document.createElement("div");
                 wrapper.className = "warp-wrapper";
@@ -615,12 +621,13 @@
                 card.setAttribute("role", "button");
                 card.setAttribute("aria-expanded", "false");
 
-                const imagePath = warp.screenshot ? "images/" + warp.screenshot : null;
+                const imagePath = warp.screenshot && warp.screenshot.trim() !== "" ? "images/" + warp.screenshot : null;
                 if (imagePath) {
                     card.style.backgroundImage = `url('${imagePath}')`;
                     card.style.backgroundSize = "cover";
                 } else {
-                    card.style.background = "linear-gradient(135deg, #2a282f, #13111a)";
+                    // для биомов фон более природный
+                    card.style.background = "linear-gradient(135deg, #2a482a, #1c2a1a)";
                 }
 
                 let cardHTML = `<span class="warp-card__text">`;
@@ -631,10 +638,11 @@
                 const detailDiv = document.createElement("div");
                 detailDiv.className = "warp-detail";
 
+                // ---------- СКРИНШОТ / ПЛЕЙСХОЛДЕР ----------
                 const screenshotContainer = document.createElement("div");
                 screenshotContainer.className = "full-screenshot";
-                const imgElement = document.createElement("img");
                 if (imagePath) {
+                    const imgElement = document.createElement("img");
                     imgElement.src = imagePath;
                     imgElement.alt = `${warp.name} – полный вид`;
                     imgElement.loading = "lazy";
@@ -642,50 +650,83 @@
                         imgElement.style.display = "none";
                         const fallback = document.createElement("div");
                         fallback.className = "placeholder-img";
-                        fallback.innerText = "🖼️ Скриншот измерения не загружен";
+                        fallback.innerText = isBiome ? "🌿 Ландшафт биома не загружен" : "🖼️ Скриншот измерения не загружен";
                         screenshotContainer.appendChild(fallback);
                     };
                     screenshotContainer.appendChild(imgElement);
                 } else {
                     const placeholder = document.createElement("div");
                     placeholder.className = "placeholder-img";
-                    placeholder.innerText = "🌄 Изображение отсутствует";
+                    if (isBiome) placeholder.innerText = "🌳 Биом · великолепие природы";
+                    else placeholder.innerText = "🌄 Изображение отсутствует";
                     screenshotContainer.appendChild(placeholder);
                 }
 
+                // ---------- ИНФОРМАЦИОННАЯ ЧАСТЬ (спецлогика для биомов) ----------
                 const infoDiv = document.createElement("div");
                 infoDiv.className = "detail-info";
-                
-                const discovererRow = document.createElement("div");
-                discovererRow.className = "info-row";
-                discovererRow.innerHTML = `<div class="info-label">🔍 ПЕРВООТКРЫВАТЕЛЬ</div><div class="info-value">${escapeHtml(warp.discoverer || 'Неизвестный странник')}</div>`;
-                infoDiv.appendChild(discovererRow);
-                
-                if (activeCategory === "crash" && warp.dateOpened) {
-                    const dateRow = document.createElement("div");
-                    dateRow.className = "info-row";
-                    dateRow.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">${escapeHtml(warp.dateOpened)}</div>`;
-                    infoDiv.appendChild(dateRow);
+
+                if (isBiome) {
+                    // === КАТЕГОРИЯ "БИОМЫ": показываем "ВАРП" и "XYZ" ===
+                    const warpRow = document.createElement("div");
+                    warpRow.className = "info-row";
+                    warpRow.innerHTML = `
+                        <div class="info-label">🎯 ВАРП</div>
+                        <div class="info-value">${escapeHtml(warp.discoverer || 'Не указан')}</div>
+                    `;
+                    infoDiv.appendChild(warpRow);
+                    
+                    const coordsRow = document.createElement("div");
+                    coordsRow.className = "info-row";
+                    coordsRow.innerHTML = `
+                        <div class="info-label">📍 XYZ</div>
+                        <div class="info-value">${escapeHtml(warp.desc && warp.desc.trim() !== "" ? warp.desc : 'координаты неизвестны')}</div>
+                    `;
+                    infoDiv.appendChild(coordsRow);
+                    
+                    // дополнительно можно показать тип биома (name уже отображается на карточке)
+                    const biomeHint = document.createElement("div");
+                    biomeHint.className = "info-row";
+                    biomeHint.innerHTML = `
+                        <div class="info-label">🌿 ТИП БИОМА</div>
+                        <div class="info-value">${escapeHtml(warp.name)}</div>
+                    `;
+                    infoDiv.appendChild(biomeHint);
                 } 
-                else if (warp.desc && warp.desc.trim() !== "") {
-                    const descRow = document.createElement("div");
-                    descRow.className = "info-row";
-                    const labelText = (activeCategory === "crash") ? "📆 ДАТА ОТКРЫТИЯ" : "📖 ОПИСАНИЕ";
-                    descRow.innerHTML = `<div class="info-label">${labelText}</div><div class="info-value">${escapeHtml(warp.desc)}</div>`;
-                    infoDiv.appendChild(descRow);
-                } 
-                else if (activeCategory !== "crash") {
-                    const stubRow = document.createElement("div");
-                    stubRow.className = "info-row";
-                    stubRow.innerHTML = `<div class="info-label">📖 ОПИСАНИЕ</div><div class="info-value"></div>`;
-                    infoDiv.appendChild(stubRow);
-                }
-                
-                if (activeCategory === "crash" && !warp.dateOpened && (!warp.desc || warp.desc === null)) {
-                    const missingDate = document.createElement("div");
-                    missingDate.className = "info-row";
-                    missingDate.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">Данные утеряны в хрониках бесконечности</div>`;
-                    infoDiv.appendChild(missingDate);
+                else {
+                    // СТАНДАРТНАЯ ЛОГИКА ДЛЯ ДРУГИХ КАТЕГОРИЙ (main, crash, flat, guardian)
+                    // первооткрыватель
+                    const discovererRow = document.createElement("div");
+                    discovererRow.className = "info-row";
+                    discovererRow.innerHTML = `<div class="info-label">🔍 ПЕРВООТКРЫВАТЕЛЬ</div><div class="info-value">${escapeHtml(warp.discoverer || 'Неизвестный странник')}</div>`;
+                    infoDiv.appendChild(discovererRow);
+                    
+                    if (activeCategory === "crash" && warp.dateOpened) {
+                        const dateRow = document.createElement("div");
+                        dateRow.className = "info-row";
+                        dateRow.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">${escapeHtml(warp.dateOpened)}</div>`;
+                        infoDiv.appendChild(dateRow);
+                    } 
+                    else if (warp.desc && warp.desc.trim() !== "") {
+                        const descRow = document.createElement("div");
+                        descRow.className = "info-row";
+                        const labelText = (activeCategory === "crash") ? "📆 ДАТА ОТКРЫТИЯ" : "📖 ОПИСАНИЕ";
+                        descRow.innerHTML = `<div class="info-label">${labelText}</div><div class="info-value">${escapeHtml(warp.desc)}</div>`;
+                        infoDiv.appendChild(descRow);
+                    } 
+                    else if (activeCategory !== "crash") {
+                        const stubRow = document.createElement("div");
+                        stubRow.className = "info-row";
+                        stubRow.innerHTML = `<div class="info-label">📖 ОПИСАНИЕ</div><div class="info-value">Описание отсутствует</div>`;
+                        infoDiv.appendChild(stubRow);
+                    }
+                    
+                    if (activeCategory === "crash" && !warp.dateOpened && (!warp.desc || warp.desc === null)) {
+                        const missingDate = document.createElement("div");
+                        missingDate.className = "info-row";
+                        missingDate.innerHTML = `<div class="info-label">📅 ДАТА ОТКРЫТИЯ</div><div class="info-value">Данные утеряны в хрониках бесконечности</div>`;
+                        infoDiv.appendChild(missingDate);
+                    }
                 }
                 
                 detailDiv.appendChild(screenshotContainer);
@@ -773,6 +814,7 @@
                     activeCategory = cat.id;
                     document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
                     btn.classList.add("active");
+                    // закрыть все открытые детали
                     document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
                         detail.classList.remove("expanded");
                         if (detail.parentElement) {
@@ -790,7 +832,7 @@
         
         buildCategoryMenu();
         render();
-        renderTopPlayers();  // отображаем топ игроков (не двигается, статичный список)
+        renderTopPlayers();
         
         window.addEventListener("resize", () => {
             document.querySelectorAll(".warp-detail.expanded").forEach(detail => {
